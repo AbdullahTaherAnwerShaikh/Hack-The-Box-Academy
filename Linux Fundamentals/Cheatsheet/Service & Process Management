@@ -1,0 +1,377 @@
+============================================================
+LINUX SERVICE & PROCESS MANAGEMENT CHEAT SHEET
+============================================================
+
+-----------------------------
+1. WHAT IS A PROCESS?
+-----------------------------
+A process is a running instance of a program.
+
+View running processes:
+ps
+ps aux
+ps -ef
+
+Real-time process viewer:
+top
+htop
+
+Search for a process:
+ps aux | grep nginx
+pgrep ssh
+pidof apache2
+
+View process tree:
+pstree
+pstree -p
+
+------------------------------------------------------------
+2. PROCESS STATES
+------------------------------------------------------------
+R = Running
+S = Sleeping (interruptible)
+D = Uninterruptible sleep (usually waiting for I/O)
+T = Stopped/Traced
+Z = Zombie
+
+------------------------------------------------------------
+3. SIGNALS
+------------------------------------------------------------
+Gracefully terminate:
+kill PID
+
+Force terminate:
+kill -9 PID
+
+Terminate by name:
+pkill firefox
+killall firefox
+
+Common Signals:
+SIGTERM (15) - Graceful shutdown (default)
+SIGKILL (9)  - Force kill
+SIGSTOP (19) - Pause process
+SIGCONT (18) - Resume process
+
+------------------------------------------------------------
+4. BACKGROUND & FOREGROUND JOBS
+------------------------------------------------------------
+Run in background:
+command &
+
+View jobs:
+jobs
+
+Bring to foreground:
+fg
+fg %1
+
+Send current process to background:
+Ctrl + Z
+bg
+
+Detach from terminal:
+nohup command &
+disown
+
+------------------------------------------------------------
+5. PROCESS PRIORITY
+------------------------------------------------------------
+View priority:
+top
+
+Start with priority:
+nice -n 10 command
+
+Change priority:
+renice 5 PID
+
+Priority range:
+-20 = Highest priority
+19  = Lowest priority
+
+------------------------------------------------------------
+6. SYSTEMD
+------------------------------------------------------------
+systemd is Linux's init system and service manager.
+
+PID 1:
+ps -p 1
+
+------------------------------------------------------------
+7. SYSTEMCTL BASICS
+------------------------------------------------------------
+Start service:
+sudo systemctl start SERVICE
+
+Stop service:
+sudo systemctl stop SERVICE
+
+Restart service:
+sudo systemctl restart SERVICE
+
+Reload configuration:
+sudo systemctl reload SERVICE
+
+Check status:
+systemctl status SERVICE
+
+Enable at boot:
+sudo systemctl enable SERVICE
+
+Disable at boot:
+sudo systemctl disable SERVICE
+
+Reload unit files:
+sudo systemctl daemon-reload
+
+------------------------------------------------------------
+8. LISTING SERVICES
+------------------------------------------------------------
+List active services:
+systemctl list-units --type=service
+
+List all services:
+systemctl list-units --type=service --all
+
+List enabled services:
+systemctl list-unit-files --type=service
+
+------------------------------------------------------------
+9. UNDERSTANDING STATUS
+------------------------------------------------------------
+LOAD
+loaded      = Unit file loaded
+not-found   = Unit missing
+masked      = Cannot be started
+
+ACTIVE
+active      = Running
+inactive    = Stopped
+failed      = Failed
+activating  = Starting
+
+SUB
+running     = Process is running
+dead        = Stopped
+exited      = Finished successfully
+waiting     = Waiting for event
+
+------------------------------------------------------------
+10. UNIT FILES
+------------------------------------------------------------
+Common locations:
+
+/usr/lib/systemd/system/
+/lib/systemd/system/
+/etc/systemd/system/
+
+------------------------------------------------------------
+11. UNIT TYPES
+------------------------------------------------------------
+.service = Service
+.socket  = Socket
+.timer   = Scheduled task
+.mount   = Mount point
+.target  = Group of units
+.device  = Hardware device
+.path    = Watches file/directory changes
+.swap    = Swap device
+
+------------------------------------------------------------
+12. SERVICE FILE STRUCTURE
+------------------------------------------------------------
+[Unit]
+Description=
+After=
+Requires=
+
+[Service]
+Type=
+ExecStart=
+ExecStop=
+Restart=
+User=
+Group=
+
+[Install]
+WantedBy=
+
+------------------------------------------------------------
+13. [UNIT]
+------------------------------------------------------------
+Description=
+Human readable description.
+
+After=
+Start after another unit.
+
+Requires=
+Must have another unit running.
+
+Example:
+After=network.target
+
+------------------------------------------------------------
+14. [SERVICE]
+------------------------------------------------------------
+ExecStart=
+Command to execute.
+
+ExecStop=
+Command to stop service.
+
+Restart=
+Restart policy.
+
+User=
+Run as specific user.
+
+Group=
+Run as specific group.
+
+------------------------------------------------------------
+15. SERVICE TYPES
+------------------------------------------------------------
+simple
+Default. Process starts immediately.
+
+forking
+Process forks into background.
+
+oneshot
+Runs once then exits.
+
+notify
+Notifies systemd when ready.
+
+idle
+Starts after all jobs finish.
+
+------------------------------------------------------------
+16. [INSTALL]
+------------------------------------------------------------
+Controls what happens when:
+systemctl enable SERVICE
+
+Example:
+WantedBy=multi-user.target
+
+Enabling creates a symbolic link inside:
+multi-user.target.wants/
+
+------------------------------------------------------------
+17. TIMERS
+------------------------------------------------------------
+Replacement for cron.
+
+Timer file:
+mybackup.timer
+
+Service file:
+mybackup.service
+
+Start timer:
+systemctl start mybackup.timer
+
+Enable timer:
+systemctl enable mybackup.timer
+
+List timers:
+systemctl list-timers
+
+------------------------------------------------------------
+18. TIMER OPTIONS
+------------------------------------------------------------
+OnBootSec=
+Run after boot.
+
+OnStartupSec=
+Run after systemd starts.
+
+OnUnitActiveSec=
+Run X time after last run.
+
+OnCalendar=
+Run on calendar schedule.
+
+Examples:
+OnBootSec=5min
+OnUnitActiveSec=1hour
+OnCalendar=daily
+
+------------------------------------------------------------
+19. TIMER FILE STRUCTURE
+------------------------------------------------------------
+[Unit]
+Description=My Timer
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=1hour
+
+[Install]
+WantedBy=timers.target
+
+------------------------------------------------------------
+20. .d DIRECTORIES
+------------------------------------------------------------
+Example:
+ssh.service.d/
+mytimer.timer.d/
+
+Purpose:
+Override or extend configuration without modifying the original unit file.
+
+Example:
+ssh.service
++
+ssh.service.d/override.conf
+=
+Final configuration
+
+------------------------------------------------------------
+21. .WANTS DIRECTORIES
+------------------------------------------------------------
+Example:
+multi-user.target.wants/
+timers.target.wants/
+
+Purpose:
+Contains symbolic links to enabled units.
+
+Created automatically by:
+systemctl enable SERVICE
+
+------------------------------------------------------------
+22. JOURNALCTL
+------------------------------------------------------------
+View logs:
+journalctl
+
+Logs for one service:
+journalctl -u ssh
+
+Follow logs:
+journalctl -f
+
+Today's logs:
+journalctl --since today
+
+Boot logs:
+journalctl -b
+
+Previous boot:
+journalctl -b -1
+
+------------------------------------------------------------
+23. CRON
+------------------------------------------------------------
+Edit cron:
+crontab -e
+
+View cron:
+crontab -l
+
+System cron:
+/etc/crontab
