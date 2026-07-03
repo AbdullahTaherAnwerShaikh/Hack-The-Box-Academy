@@ -7,5 +7,5 @@ pid=$(cat /tmp/currentServer.pid)
 if kill -0 $pid 2>/dev/null; then
     echo "Server is running as intended with PID: $pid"
 else
-    ./starter.sh --restart&
+    ./home/htb-ac-2418095/starter.sh --restart&
 fi
