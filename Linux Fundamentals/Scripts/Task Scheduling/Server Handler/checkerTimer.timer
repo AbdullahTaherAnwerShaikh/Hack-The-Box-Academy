@@ -1,0 +1,13 @@
+[Unit]
+Description=Run Python Server Health Checker Every Minute
+
+[Timer]
+# Run 1 minute after the system boots up
+OnBootSec=1min
+# Run every 1 minute after that
+OnUnitActiveSec=1min
+# Keep it precise
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target
