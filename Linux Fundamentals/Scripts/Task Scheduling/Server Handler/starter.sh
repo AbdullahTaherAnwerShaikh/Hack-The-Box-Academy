@@ -4,7 +4,7 @@
 flag=$1
 
 #logMsg stores whether its a start or restart
-if [ "$flag" == "--restart" ] then;
+if [ "$flag" == "--restart" ]; then
     logMsg="Server Status: Restarted"
 else
     logMsg="Server Status: Started"
@@ -24,6 +24,7 @@ time=$(ps -p $pid -o lstart=)
 
 #logs data efficiently using blocks
 {
+    echo "$logMsg"
     echo "Process ID: $pid"
     echo "Startup Time: $time"
     echo "-------------------"
