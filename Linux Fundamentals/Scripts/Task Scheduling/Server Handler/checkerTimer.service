@@ -1,0 +1,17 @@
+[Unit]
+# A human-readable name for the service shown in system logs
+Description=Python Server Health Checker
+# Ensures this task waits until the network is fully up before running
+After=network.target
+
+[Service]
+# 'simple' means systemd considers the service active as soon as ExecStart begins
+Type=simple
+# The absolute path to the command or script you want systemd to execute
+ExecStart=/bin/bash /home/htb-ac-2418095/checker.sh
+# Runs the script as your specific user instead of 'root' for security
+User=htb-ac-2418095
+
+[Install]
+# Links this service to the standard system startup screen (multi-user target)
+WantedBy=multi-user.target
