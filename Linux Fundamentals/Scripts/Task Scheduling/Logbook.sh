@@ -6,4 +6,4 @@ users >> /home/htb-ac-2418095/logbook.log
 echo "----------------" >> /home/htb-ac-2418095/logbook.log
 
 
-#Used to log data into logbook at regular intervals using either crontab or systemd timer
+#Used to log data into logbook at regular time intervals using either crontab or systemd timer
