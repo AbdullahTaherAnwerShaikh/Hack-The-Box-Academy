@@ -4,7 +4,7 @@
 flag=$1
 
 #logMsg stores whether its a start or restart
-if["$flag" == "--restart"] then;
+if [ "$flag" == "--restart" ] then;
     logMsg="Server Status: Restarted"
 else
     logMsg="Server Status: Started"
@@ -17,7 +17,7 @@ python3 -m http.server 8080 &
 pid=$!
 
 #storing the pid of the server to a temporary file for regular check
-$pid > /tmp/currentServer.pid
+echo "$pid" > /tmp/currentServer.pid
 
 #retrieves start time of the server
 time=$(ps -p $pid -o lstart=)
