@@ -1,0 +1,343 @@
+=========================================
+NETWORK SERVICES + WEB SERVICES CHEAT SHEET
+=========================================
+
+-------------------------------------------------
+1. HOST DISCOVERY & DNS
+-------------------------------------------------
+
+hostname
+hostname -I
+ip a
+ip route
+ping <host>
+
+nslookup <domain>
+dig <domain>
+dig @<DNS_Server> <domain>
+host <domain>
+
+-------------------------------------------------
+2. PORT ENUMERATION
+-------------------------------------------------
+
+# Check listening ports
+ss -tulnp
+ss -tun
+netstat -tulnp
+
+# Which process owns a port?
+lsof -i :80
+fuser 80/tcp
+
+-------------------------------------------------
+3. HTTP / HTTPS (curl)
+-------------------------------------------------
+
+# View webpage
+curl http://IP
+
+# View only headers
+curl -I http://IP
+
+# Verbose request
+curl -v http://IP
+
+# Follow redirects
+curl -L http://IP
+
+# Ignore SSL certificate
+curl -k https://IP
+
+# Download file
+curl -O http://IP/file
+curl -o output.txt http://IP/file
+
+# Basic Authentication
+curl -u user:password http://IP
+
+# POST request
+curl -X POST http://IP/login \
+-d "username=admin&password=admin"
+
+# Send JSON
+curl -X POST http://IP/api \
+-H "Content-Type: application/json" \
+-d '{"user":"admin"}'
+
+# Custom Header
+curl -H "User-Agent: Mozilla/5.0" http://IP
+
+# Cookies
+curl -c cookies.txt http://IP
+curl -b cookies.txt http://IP
+
+-------------------------------------------------
+4. HTTP / HTTPS (wget)
+-------------------------------------------------
+
+wget http://IP/file
+wget -O filename http://IP/file
+wget -c http://IP/file
+wget -r http://IP
+
+-------------------------------------------------
+5. SIMPLE WEB SERVERS
+-------------------------------------------------
+
+# Python
+python3 -m http.server
+python3 -m http.server 8000
+
+# PHP
+php -S 127.0.0.1:8080
+
+# Node.js (http-server package)
+http-server -p 8080
+
+-------------------------------------------------
+6. APACHE
+-------------------------------------------------
+
+# Service
+systemctl status apache2
+systemctl start apache2
+systemctl stop apache2
+systemctl restart apache2
+
+# Web Root (Ubuntu)
+/var/www/html/
+
+# Main Config
+/etc/apache2/apache2.conf
+
+# Virtual Hosts
+/etc/apache2/sites-available/
+/etc/apache2/sites-enabled/
+
+# Logs
+/var/log/apache2/access.log
+/var/log/apache2/error.log
+
+-------------------------------------------------
+7. NGINX
+-------------------------------------------------
+
+systemctl status nginx
+systemctl restart nginx
+
+# Config
+/etc/nginx/nginx.conf
+
+# Sites
+/etc/nginx/sites-available/
+/etc/nginx/sites-enabled/
+
+# Web Root
+/usr/share/nginx/html/
+
+-------------------------------------------------
+8. FTP
+-------------------------------------------------
+
+ftp <IP>
+
+anonymous
+ls
+pwd
+cd
+get <file>
+put <file>
+mget *
+mput *
+bye
+
+-------------------------------------------------
+9. SCP (SSH FILE TRANSFER)
+-------------------------------------------------
+
+# Download
+scp user@IP:/path/file .
+
+# Upload
+scp file user@IP:/path/
+
+# Recursive
+scp -r folder user@IP:/path/
+
+-------------------------------------------------
+10. RSYNC
+-------------------------------------------------
+
+# Copy locally
+rsync -av source/ dest/
+
+# Download
+rsync -av user@IP:/dir .
+
+# Upload
+rsync -av folder user@IP:/dir
+
+-------------------------------------------------
+11. SSH
+-------------------------------------------------
+
+ssh user@IP
+ssh -p 2222 user@IP
+ssh -i id_rsa user@IP
+ssh -X user@IP
+
+# Execute one command
+ssh user@IP "id"
+
+-------------------------------------------------
+12. SMB
+-------------------------------------------------
+
+# List shares
+smbclient -L //IP
+
+# Connect
+smbclient //IP/share
+
+# Common Commands
+ls
+cd
+get file
+put file
+mkdir dir
+rm file
+exit
+
+-------------------------------------------------
+13. NFS
+-------------------------------------------------
+
+# Show exports
+showmount -e IP
+
+# Mount
+sudo mount -t nfs IP:/share /mnt/nfs
+
+# Unmount
+sudo umount /mnt/nfs
+
+-------------------------------------------------
+14. WEB ENUMERATION
+-------------------------------------------------
+
+# Fingerprint
+whatweb http://IP
+
+# Directories
+gobuster dir -u http://IP -w wordlist.txt
+dirb http://IP
+ffuf -u http://IP/FUZZ -w wordlist.txt
+
+# Technology Detection
+curl -I http://IP
+whatweb http://IP
+
+-------------------------------------------------
+15. TESTING HTTP RESPONSES
+-------------------------------------------------
+
+# Status code
+curl -o /dev/null -s -w "%{http_code}\n" http://IP
+
+# Redirect location
+curl -I http://IP
+
+# Response headers
+curl -I http://IP
+
+# Server banner
+curl -I http://IP | grep Server
+
+-------------------------------------------------
+16. OPENSSL
+-------------------------------------------------
+
+# View certificate
+openssl s_client -connect IP:443
+
+# View certificate details
+openssl x509 -text
+
+-------------------------------------------------
+17. TELNET / NETCAT
+-------------------------------------------------
+
+# Connect to port
+telnet IP 80
+nc IP 80
+
+# Banner grabbing
+nc -nv IP 22
+nc -nv IP 25
+
+-------------------------------------------------
+18. PYTHON WEB REQUESTS
+-------------------------------------------------
+
+python3 -m http.server
+
+-------------------------------------------------
+19. COMMON WEB FILES
+-------------------------------------------------
+
+index.html
+index.php
+robots.txt
+favicon.ico
+sitemap.xml
+.htaccess
+.web.config
+
+-------------------------------------------------
+20. IMPORTANT DIRECTORIES
+-------------------------------------------------
+
+/var/www/html/
+/etc/apache2/
+/etc/nginx/
+/var/log/apache2/
+/var/log/nginx/
+
+-------------------------------------------------
+21. COMMON PORTS
+-------------------------------------------------
+
+20/21   FTP
+22      SSH / SCP / SFTP
+23      Telnet
+25      SMTP
+53      DNS
+80      HTTP
+110     POP3
+111     RPC
+139     NetBIOS
+143     IMAP
+443     HTTPS
+445     SMB
+873     Rsync
+2049    NFS
+3306    MySQL
+5432    PostgreSQL
+5900    VNC
+3389    RDP
+
+-------------------------------------------------
+22. QUICK ENUMERATION FLOW
+-------------------------------------------------
+
+1. ping <IP>
+2. nmap <IP>
+3. curl http://IP
+4. curl -I http://IP
+5. whatweb http://IP
+6. gobuster/ffuf
+7. Check robots.txt
+8. Check page source (Ctrl+U)
+9. Enumerate service-specific protocols (FTP, SMB, NFS, SSH)
+10. Review banners, headers, and logs if available
