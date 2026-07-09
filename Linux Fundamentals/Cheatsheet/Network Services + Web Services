@@ -341,3 +341,81 @@ sitemap.xml
 8. Check page source (Ctrl+U)
 9. Enumerate service-specific protocols (FTP, SMB, NFS, SSH)
 10. Review banners, headers, and logs if available
+
+-------------------------------------------------
+23. OPENVPN
+-------------------------------------------------
+
+# Install OpenVPN
+sudo apt install openvpn
+
+# Connect using configuration file
+sudo openvpn <config_file>.ovpn
+
+# Connect in background
+sudo openvpn <config_file>.ovpn &
+
+# Run with specific config path
+sudo openvpn --config <config_file>.ovpn
+
+# Disconnect
+Ctrl + C
+
+# Check VPN interface
+ip a
+
+# Usually creates:
+tun0
+
+# Check routing table
+ip route
+
+# Check VPN routes
+route -n
+
+# Verify external IP
+curl ifconfig.me
+
+# Check connection status
+systemctl status openvpn
+
+# Start OpenVPN service
+sudo systemctl start openvpn
+
+# Enable OpenVPN at boot
+sudo systemctl enable openvpn
+
+# Kill OpenVPN process
+sudo pkill openvpn
+
+# View OpenVPN logs
+journalctl -u openvpn
+
+# Test connectivity through VPN
+ping <VPN_TARGET_IP>
+
+# DNS check
+nslookup <domain>
+
+# Common HTB VPN workflow
+
+1. Download .ovpn file
+2. Start VPN:
+
+sudo openvpn lab.ovpn
+
+3. Verify interface:
+
+ip a
+
+4. Verify route:
+
+ip route
+
+5. Test connection:
+
+ping <target_IP>
+
+6. Start enumeration:
+
+nmap <target_IP>
