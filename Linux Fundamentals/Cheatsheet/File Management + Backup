@@ -1,0 +1,333 @@
+=========================================
+BACKUP & RESTORE CHEAT SHEET
+=========================================
+
+-------------------------------------------------
+1. TAR (Archive Files)
+-------------------------------------------------
+
+# Create archive
+tar -cf backup.tar file1 file2 dir/
+
+# Archive entire directory
+tar -cf backup.tar /home/user/
+
+# List archive contents
+tar -tf backup.tar
+
+# Extract archive
+tar -xf backup.tar
+
+# Extract to directory
+tar -xf backup.tar -C /tmp/
+
+# Extract specific file
+tar -xf backup.tar file.txt
+
+-------------------------------------------------
+2. COMPRESSED TAR ARCHIVES
+-------------------------------------------------
+
+# gzip (.tar.gz / .tgz)
+tar -czf backup.tar.gz dir/
+tar -xzf backup.tar.gz
+
+# bzip2 (.tar.bz2)
+tar -cjf backup.tar.bz2 dir/
+tar -xjf backup.tar.bz2
+
+# xz (.tar.xz)
+tar -cJf backup.tar.xz dir/
+tar -xJf backup.tar.xz
+
+-------------------------------------------------
+3. GZIP / BZIP2 / XZ
+-------------------------------------------------
+
+# Compress
+gzip file
+bzip2 file
+xz file
+
+# Decompress
+gunzip file.gz
+bunzip2 file.bz2
+unxz file.xz
+
+# Keep original
+gzip -k file
+bzip2 -k file
+xz -k file
+
+-------------------------------------------------
+4. ZIP
+-------------------------------------------------
+
+# Create zip
+zip backup.zip file
+zip -r backup.zip directory/
+
+# List contents
+unzip -l backup.zip
+
+# Extract
+unzip backup.zip
+
+-------------------------------------------------
+5. RSYNC
+-------------------------------------------------
+
+# Local backup
+rsync -av source/ destination/
+
+# Preserve permissions, ownership, timestamps
+rsync -a source/ destination/
+
+# Show progress
+rsync -av --progress source/ destination/
+
+# Delete removed files
+rsync -av --delete source/ destination/
+
+# Dry run
+rsync -av --dry-run source/ destination/
+
+# Remote backup
+rsync -av user@host:/dir .
+
+# Upload
+rsync -av folder/ user@host:/backup/
+
+-------------------------------------------------
+6. SCP
+-------------------------------------------------
+
+# Download
+scp user@host:/file .
+
+# Upload
+scp file user@host:/dir/
+
+# Recursive
+scp -r folder user@host:/dir/
+
+-------------------------------------------------
+7. DD (Disk Imaging)
+-------------------------------------------------
+
+# Clone disk
+sudo dd if=/dev/sda of=/dev/sdb bs=4M status=progress
+
+# Create image
+sudo dd if=/dev/sda of=disk.img bs=4M status=progress
+
+# Restore image
+sudo dd if=disk.img of=/dev/sda bs=4M status=progress
+
+-------------------------------------------------
+8. FILE COMPARISON
+-------------------------------------------------
+
+diff file1 file2
+cmp file1 file2
+md5sum file
+sha1sum file
+sha256sum file
+
+-------------------------------------------------
+9. FIND LARGE FILES
+-------------------------------------------------
+
+du -sh *
+du -ah | sort -h
+find / -size +100M
+
+-------------------------------------------------
+10. DISK USAGE
+-------------------------------------------------
+
+df -h
+du -sh directory/
+du -ah
+
+-------------------------------------------------
+11. FILESYSTEM BACKUP TOOLS
+-------------------------------------------------
+
+dump
+restore
+
+-------------------------------------------------
+12. FILE PERMISSIONS
+-------------------------------------------------
+
+cp -a source destination
+cp -rp source destination
+
+-------------------------------------------------
+13. SNAPSHOTS (LVM)
+-------------------------------------------------
+
+lvcreate
+lvdisplay
+lvremove
+
+-------------------------------------------------
+14. VERIFY BACKUPS
+-------------------------------------------------
+
+tar -tf archive.tar
+unzip -t backup.zip
+sha256sum file
+diff original restored
+
+-------------------------------------------------
+15. AUTOMATE BACKUPS
+-------------------------------------------------
+
+crontab -e
+
+Example:
+0 2 * * * tar -czf /backup/home.tar.gz /home/user
+
+-------------------------------------------------
+16. LOGS
+-------------------------------------------------
+
+journalctl
+journalctl -u backup.service
+
+-------------------------------------------------
+17. COMMON FILE EXTENSIONS
+-------------------------------------------------
+
+.tar
+.tar.gz
+.tgz
+.tar.bz2
+.tar.xz
+.zip
+.gz
+.bz2
+.xz
+.img
+.iso
+
+-------------------------------------------------
+18. USEFUL LOCATIONS
+-------------------------------------------------
+
+/backup/
+/mnt/
+/media/
+/home/
+/etc/
+/var/backups/
+
+-------------------------------------------------
+19. RESTORE WORKFLOW
+-------------------------------------------------
+
+1. Verify archive
+2. Extract archive
+3. Verify files
+4. Restore permissions
+5. Compare hashes
+6. Test application/service
+
+-------------------------------------------------
+20. QUICK COMMANDS
+-------------------------------------------------
+
+tar -cf archive.tar dir/
+tar -czf archive.tar.gz dir/
+tar -xf archive.tar
+tar -xzf archive.tar.gz
+
+zip -r backup.zip dir/
+unzip backup.zip
+
+gzip file
+gunzip file.gz
+
+rsync -av --progress src/ dst/
+rsync -av --delete src/ dst/
+
+scp file user@host:/dir/
+scp user@host:/file .
+
+dd if=/dev/sda of=disk.img bs=4M status=progress
+
+sha256sum file
+
+df -h
+du -sh *
+
+crontab -e
+
+-------------------------------------------------
+21. DEJA DUP
+-------------------------------------------------
+
+# GUI backup utility (GNOME)
+deja-dup
+
+# Features
+- Full and incremental backups
+- Scheduled automatic backups
+- Encryption (via duplicity)
+- Local, network, and cloud storage
+- Easy restore through GUI
+
+# Common backup destinations
+- Local Folder
+- External Drive
+- Network Share
+- Google Drive
+- Other supported cloud providers
+
+-------------------------------------------------
+22. DUPLICITY
+-------------------------------------------------
+
+# Full backup
+duplicity /home/user file:///backup
+
+# Encrypted backup (GPG)
+duplicity --encrypt-key <GPG_KEY_ID> /home/user file:///backup
+
+# Restore latest backup
+duplicity restore file:///backup /restore
+
+# Restore specific file
+duplicity restore \
+--file-to-restore Documents/report.pdf \
+file:///backup /restore/report.pdf
+
+# Incremental backup
+duplicity incr /home/user file:///backup
+
+# Verify backup
+duplicity verify file:///backup /home/user
+
+# List backup files
+duplicity collection-status file:///backup
+
+# Remove backups older than 30 days
+duplicity remove-older-than 30D file:///backup
+
+# Common backend examples
+file:///backup
+scp://user@host//backup
+sftp://user@host//backup
+ftp://user@host/backup
+
+-------------------------------------------------
+23. DEJA DUP vs DUPLICITY
+-------------------------------------------------
+
+Deja Dup   → GUI frontend
+Duplicity  → Command-line backup engine
+
+Deja Dup internally uses Duplicity to create encrypted,
+compressed, incremental backups.
