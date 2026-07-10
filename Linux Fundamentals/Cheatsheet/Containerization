@@ -1,0 +1,528 @@
+=========================================
+DOCKER & CONTAINERIZATION CHEAT SHEET
+=========================================
+
+-------------------------------------------------
+1. BASIC CONCEPTS
+-------------------------------------------------
+
+Container      = Running isolated application
+Image          = Read-only template used to create containers
+Dockerfile     = Instructions to build an image
+Registry       = Stores images (Docker Hub, GHCR, etc.)
+Volume         = Persistent storage
+Network        = Communication between containers
+Daemon         = Docker Engine (dockerd)
+CLI            = docker
+
+Flow:
+Dockerfile
+    ↓
+docker build
+    ↓
+Image
+    ↓
+docker run
+    ↓
+Container
+
+-------------------------------------------------
+2. DOCKER SERVICE
+-------------------------------------------------
+
+systemctl status docker
+systemctl start docker
+systemctl stop docker
+systemctl restart docker
+systemctl enable docker
+
+-------------------------------------------------
+3. DOCKER VERSION & INFO
+-------------------------------------------------
+
+docker version
+docker info
+
+-------------------------------------------------
+4. IMAGES
+-------------------------------------------------
+
+# List images
+docker images
+docker image ls
+
+# Download image
+docker pull ubuntu
+docker pull nginx
+docker pull alpine
+
+# Remove image
+docker rmi <IMAGE_ID>
+docker image rm <IMAGE_ID>
+
+# Remove unused images
+docker image prune
+
+-------------------------------------------------
+5. CONTAINERS
+-------------------------------------------------
+
+# List running containers
+docker ps
+
+# List all containers
+docker ps -a
+
+# Create & start container
+docker run ubuntu
+
+# Interactive shell
+docker run -it ubuntu bash
+
+# Detached mode
+docker run -d nginx
+
+# Name container
+docker run --name web nginx
+
+# Remove automatically after exit
+docker run --rm ubuntu
+
+# Start existing container
+docker start <CONTAINER>
+
+# Stop container
+docker stop <CONTAINER>
+
+# Restart container
+docker restart <CONTAINER>
+
+# Kill container
+docker kill <CONTAINER>
+
+# Remove container
+docker rm <CONTAINER>
+
+# Remove stopped containers
+docker container prune
+
+-------------------------------------------------
+6. EXECUTE COMMANDS
+-------------------------------------------------
+
+# Open shell
+docker exec -it <CONTAINER> bash
+
+# Alpine shell
+docker exec -it <CONTAINER> sh
+
+# Run one command
+docker exec <CONTAINER> ls
+
+-------------------------------------------------
+7. LOGS
+-------------------------------------------------
+
+docker logs <CONTAINER>
+docker logs -f <CONTAINER>
+
+-------------------------------------------------
+8. INSPECT
+-------------------------------------------------
+
+docker inspect <CONTAINER>
+docker inspect <IMAGE>
+
+-------------------------------------------------
+9. COPY FILES
+-------------------------------------------------
+
+# Host → Container
+docker cp file.txt container:/tmp/
+
+# Container → Host
+docker cp container:/etc/passwd .
+
+-------------------------------------------------
+10. PORT MAPPING
+-------------------------------------------------
+
+Host:Container
+
+docker run -p 8080:80 nginx
+
+Access:
+http://localhost:8080
+
+-------------------------------------------------
+11. VOLUMES
+-------------------------------------------------
+
+# Create volume
+docker volume create myvolume
+
+# List volumes
+docker volume ls
+
+# Inspect
+docker volume inspect myvolume
+
+# Remove
+docker volume rm myvolume
+
+# Mount volume
+docker run -v myvolume:/data ubuntu
+
+# Bind mount
+docker run -v $(pwd):/app ubuntu
+
+-------------------------------------------------
+12. NETWORKS
+-------------------------------------------------
+
+# List
+docker network ls
+
+# Create
+docker network create mynetwork
+
+# Inspect
+docker network inspect mynetwork
+
+# Remove
+docker network rm mynetwork
+
+# Connect container
+docker network connect mynetwork web
+
+-------------------------------------------------
+13. IMAGE BUILDING
+-------------------------------------------------
+
+# Build image
+docker build -t myimage .
+
+# Tag image
+docker tag myimage username/myimage:v1
+
+-------------------------------------------------
+14. DOCKERFILE (COMMON)
+-------------------------------------------------
+
+FROM ubuntu:22.04
+WORKDIR /app
+COPY . .
+RUN apt update
+RUN apt install -y python3
+EXPOSE 8000
+CMD ["python3","app.py"]
+
+-------------------------------------------------
+15. SAVE / LOAD
+-------------------------------------------------
+
+docker save -o image.tar myimage
+docker load -i image.tar
+
+-------------------------------------------------
+16. EXPORT / IMPORT
+-------------------------------------------------
+
+docker export <CONTAINER> > container.tar
+docker import container.tar myimage
+
+-------------------------------------------------
+17. CLEANUP
+-------------------------------------------------
+
+docker system df
+docker system prune
+docker system prune -a
+
+-------------------------------------------------
+18. RESOURCE LIMITS
+-------------------------------------------------
+
+docker run --memory=512m nginx
+docker run --cpus=2 nginx
+
+-------------------------------------------------
+19. ENVIRONMENT VARIABLES
+-------------------------------------------------
+
+docker run -e USER=admin ubuntu
+
+-------------------------------------------------
+20. COMMON ENUMERATION
+-------------------------------------------------
+
+docker ps
+docker ps -a
+docker images
+docker volume ls
+docker network ls
+docker info
+docker inspect <CONTAINER>
+docker logs <CONTAINER>
+
+-------------------------------------------------
+21. DOCKER HUB
+-------------------------------------------------
+
+Search:
+docker search nginx
+
+Download:
+docker pull nginx
+
+Push:
+docker push username/image
+
+Login:
+docker login
+
+Logout:
+docker logout
+
+-------------------------------------------------
+22. USEFUL FLAGS
+-------------------------------------------------
+
+-it      Interactive terminal
+-d       Detached/background
+-p       Port mapping
+-v       Mount volume
+--rm     Remove after exit
+--name   Name container
+-e       Environment variable
+
+-------------------------------------------------
+23. COMMON PORT MAPPINGS
+-------------------------------------------------
+
+80      HTTP
+443     HTTPS
+3306    MySQL
+5432    PostgreSQL
+6379    Redis
+27017   MongoDB
+
+-------------------------------------------------
+24. QUICK WORKFLOW
+-------------------------------------------------
+
+1. Pull image
+docker pull nginx
+
+2. Run container
+docker run -d -p 8080:80 --name web nginx
+
+3. Check running
+docker ps
+
+4. View logs
+docker logs web
+
+5. Enter container
+docker exec -it web bash
+
+6. Stop
+docker stop web
+
+7. Remove
+docker rm web
+
+8. Remove image
+docker rmi nginx
+
+=========================================
+LXC (LINUX CONTAINERS)
+=========================================
+
+-------------------------------------------------
+1. BASIC CONCEPTS
+-------------------------------------------------
+
+LXC         = OS-level container (system container)
+LXD         = Management daemon for LXC
+Container   = Lightweight isolated Linux system
+Image       = Template used to create containers
+
+Unlike Docker (application containers),
+LXC containers behave like lightweight virtual machines.
+
+-------------------------------------------------
+2. CONTAINER MANAGEMENT
+-------------------------------------------------
+
+# List containers
+lxc list
+
+# Launch container
+lxc launch ubuntu:22.04 mycontainer
+
+# Start container
+lxc start mycontainer
+
+# Stop container
+lxc stop mycontainer
+
+# Restart container
+lxc restart mycontainer
+
+# Delete container
+lxc delete mycontainer
+
+# Force delete
+lxc delete mycontainer --force
+
+-------------------------------------------------
+3. EXECUTE COMMANDS
+-------------------------------------------------
+
+# Open shell
+lxc exec mycontainer -- bash
+
+# Run command
+lxc exec mycontainer -- ls
+
+-------------------------------------------------
+4. IMAGES
+-------------------------------------------------
+
+# List remote images
+lxc image list images:
+
+# List local images
+lxc image list
+
+# Delete image
+lxc image delete <IMAGE_FINGERPRINT>
+
+-------------------------------------------------
+5. FILE TRANSFER
+-------------------------------------------------
+
+# Host → Container
+lxc file push file.txt mycontainer/root/
+
+# Container → Host
+lxc file pull mycontainer/root/file.txt .
+
+-------------------------------------------------
+6. SNAPSHOTS
+-------------------------------------------------
+
+# Create snapshot
+lxc snapshot mycontainer snap1
+
+# List snapshots
+lxc info mycontainer
+
+# Restore snapshot
+lxc restore mycontainer snap1
+
+# Delete snapshot
+lxc delete mycontainer/snap1
+
+-------------------------------------------------
+7. INFORMATION
+-------------------------------------------------
+
+# Detailed info
+lxc info mycontainer
+
+# Configuration
+lxc config show mycontainer
+
+# Show state
+lxc list
+
+-------------------------------------------------
+8. NETWORKING
+-------------------------------------------------
+
+# Show IP
+lxc list
+
+# View network config
+lxc config show mycontainer
+
+-------------------------------------------------
+9. STORAGE
+-------------------------------------------------
+
+# List storage pools
+lxc storage list
+
+# Show storage info
+lxc storage info default
+
+-------------------------------------------------
+10. REMOTES
+-------------------------------------------------
+
+# List remotes
+lxc remote list
+
+# List images from remote
+lxc image list images:
+
+-------------------------------------------------
+11. COMMON ENUMERATION
+-------------------------------------------------
+
+lxc list
+lxc info <container>
+lxc config show <container>
+lxc image list
+lxc storage list
+lxc network list
+
+-------------------------------------------------
+12. QUICK WORKFLOW
+-------------------------------------------------
+
+1. Launch container
+lxc launch ubuntu:22.04 lab
+
+2. List containers
+lxc list
+
+3. Enter container
+lxc exec lab -- bash
+
+4. Stop
+lxc stop lab
+
+5. Delete
+lxc delete lab
+
+=========================================
+DOCKER vs LXC
+=========================================
+
+Docker
+------
+• Application containers
+• Usually one main process per container
+• Uses Docker Engine (dockerd)
+• Images from Docker Hub
+• Best for microservices, web apps, CI/CD
+
+LXC
+---
+• System containers
+• Behaves like a lightweight Linux VM
+• Can run multiple services (systemd, SSH, cron, etc.)
+• Uses LXD/LXC tools
+• Best for full Linux environments and labs
+
+Quick Comparison
+
+Docker Image        ≈ LXC Image
+Docker Container    ≈ LXC Container
+docker exec         ≈ lxc exec
+docker ps           ≈ lxc list
+docker logs         ≈ journalctl/logs inside container
+docker inspect      ≈ lxc info / lxc config show
