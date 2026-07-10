@@ -1,0 +1,304 @@
+=========================================
+NETWORK CONFIGURATION CHEAT SHEET
+=========================================
+
+-------------------------------------------------
+1. VIEW NETWORK INTERFACES
+-------------------------------------------------
+
+# Show all interfaces
+ip a
+ip addr
+ip addr show
+
+# Show only active interfaces
+ip link
+
+# Legacy
+ifconfig
+
+-------------------------------------------------
+2. ENABLE / DISABLE INTERFACE
+-------------------------------------------------
+
+# Bring interface up
+sudo ip link set eth0 up
+
+# Bring interface down
+sudo ip link set eth0 down
+
+# Legacy
+ifup eth0
+ifdown eth0
+
+-------------------------------------------------
+3. ASSIGN IP ADDRESSES
+-------------------------------------------------
+
+# Add static IP
+sudo ip addr add 192.168.1.100/24 dev eth0
+
+# Delete IP
+sudo ip addr del 192.168.1.100/24 dev eth0
+
+# Flush all IPs
+sudo ip addr flush dev eth0
+
+-------------------------------------------------
+4. DHCP
+-------------------------------------------------
+
+# Request IP
+sudo dhclient eth0
+
+# Release IP
+sudo dhclient -r eth0
+
+# Renew lease
+sudo dhclient eth0
+
+-------------------------------------------------
+5. ROUTING
+-------------------------------------------------
+
+# View routing table
+ip route
+route -n
+
+# Add default gateway
+sudo ip route add default via 192.168.1.1
+
+# Delete default gateway
+sudo ip route del default
+
+# Add static route
+sudo ip route add 10.10.10.0/24 via 192.168.1.1
+
+-------------------------------------------------
+6. DNS
+-------------------------------------------------
+
+# DNS configuration
+cat /etc/resolv.conf
+
+# Typical entries
+nameserver 8.8.8.8
+nameserver 1.1.1.1
+search company.local
+
+-------------------------------------------------
+7. NETWORK CONFIGURATION FILES
+-------------------------------------------------
+
+# Legacy Debian/Ubuntu
+/etc/network/interfaces
+
+# DNS
+/etc/resolv.conf
+
+# Hostname
+/etc/hostname
+
+# Local hostname mappings
+/etc/hosts
+
+# Ubuntu (Netplan)
+/etc/netplan/*.yaml
+
+# NetworkManager
+/etc/NetworkManager/
+
+-------------------------------------------------
+8. HOSTNAME
+-------------------------------------------------
+
+hostname
+hostnamectl
+
+# Change hostname
+sudo hostnamectl set-hostname newhost
+
+-------------------------------------------------
+9. /etc/hosts
+-------------------------------------------------
+
+# View
+cat /etc/hosts
+
+# Example
+127.0.0.1 localhost
+192.168.1.10 server
+
+-------------------------------------------------
+10. DNS TOOLS
+-------------------------------------------------
+
+nslookup google.com
+dig google.com
+dig @8.8.8.8 google.com
+host google.com
+
+-------------------------------------------------
+11. CONNECTIVITY TESTING
+-------------------------------------------------
+
+ping 8.8.8.8
+ping google.com
+
+traceroute google.com
+tracepath google.com
+
+-------------------------------------------------
+12. ARP / NEIGHBOR TABLE
+-------------------------------------------------
+
+ip neigh
+arp -a
+
+-------------------------------------------------
+13. SOCKETS / PORTS
+-------------------------------------------------
+
+ss -tulnp
+ss -tun
+netstat -tulnp
+lsof -i
+lsof -i :80
+
+-------------------------------------------------
+14. INTERFACE STATISTICS
+-------------------------------------------------
+
+ip -s link
+ethtool eth0
+
+-------------------------------------------------
+15. NETWORKMANAGER (nmcli)
+-------------------------------------------------
+
+# Device status
+nmcli device
+
+# Active connections
+nmcli connection show
+
+# Bring interface up
+nmcli device connect eth0
+
+# Bring interface down
+nmcli device disconnect eth0
+
+-------------------------------------------------
+16. SYSTEMD-NETWORKD
+-------------------------------------------------
+
+systemctl status systemd-networkd
+networkctl
+networkctl status
+
+-------------------------------------------------
+17. FIREWALL (BASIC)
+-------------------------------------------------
+
+ufw status
+sudo ufw enable
+sudo ufw disable
+
+-------------------------------------------------
+18. USEFUL FILES
+-------------------------------------------------
+
+/etc/network/interfaces
+/etc/resolv.conf
+/etc/hosts
+/etc/hostname
+/etc/netplan/
+/etc/NetworkManager/
+/etc/systemd/network/
+
+-------------------------------------------------
+19. COMMON ENUMERATION
+-------------------------------------------------
+
+hostname
+hostnamectl
+ip a
+ip link
+ip route
+ip neigh
+ss -tulnp
+cat /etc/hosts
+cat /etc/resolv.conf
+cat /etc/network/interfaces
+nmcli device
+networkctl
+
+-------------------------------------------------
+20. COMMON INTERFACE NAMES
+-------------------------------------------------
+
+eth0        Ethernet (legacy)
+ens33       Predictable Ethernet name
+enp0s3      Predictable Ethernet name
+wlan0       Wireless (legacy)
+wlp2s0      Predictable Wireless name
+lo          Loopback
+tun0        VPN tunnel (OpenVPN)
+docker0     Docker bridge
+br0         Bridge interface
+
+-------------------------------------------------
+21. QUICK STATIC IP SETUP
+-------------------------------------------------
+
+sudo ip link set eth0 up
+
+sudo ip addr add 192.168.1.100/24 dev eth0
+
+sudo ip route add default via 192.168.1.1
+
+echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
+
+-------------------------------------------------
+22. QUICK DHCP SETUP
+-------------------------------------------------
+
+sudo ip link set eth0 up
+
+sudo dhclient eth0
+
+Verify:
+ip a
+ip route
+cat /etc/resolv.conf
+
+-------------------------------------------------
+23. NETWORK TROUBLESHOOTING FLOW
+-------------------------------------------------
+
+1. ip link
+   → Is interface UP?
+
+2. ip a
+   → Does it have an IP?
+
+3. ip route
+   → Is there a default gateway?
+
+4. ping <gateway>
+   → Local network reachable?
+
+5. ping 8.8.8.8
+   → Internet reachable?
+
+6. ping google.com
+   → DNS working?
+
+7. cat /etc/resolv.conf
+   → Correct DNS server?
+
+8. ss -tulnp
+   → Required service listening?
+
+9. traceroute <host>
+   → Where is traffic failing?
