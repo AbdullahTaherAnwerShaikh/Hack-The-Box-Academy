@@ -1,0 +1,278 @@
+=========================================
+REMOTE DESKTOP & REMOTE GUI CHEAT SHEET
+(RDP • VNC • X11)
+=========================================
+
+-------------------------------------------------
+1. DEFAULT PORTS
+-------------------------------------------------
+
+SSH            TCP/22
+RDP            TCP/3389
+VNC            TCP/5900 + Display Number
+X11            TCP/6000 + Display Number
+X11 over SSH   TCP/22
+
+Examples:
+Display :0 → TCP/6000
+Display :1 → TCP/6001
+Display :2 → TCP/6002
+
+-------------------------------------------------
+2. SSH (COMMAND LINE)
+-------------------------------------------------
+
+# Remote shell
+ssh user@host
+
+# Specify port
+ssh -p 2222 user@host
+
+# X11 Forwarding
+ssh -X user@host
+
+# Trusted X11 Forwarding
+ssh -Y user@host
+
+-------------------------------------------------
+3. RDP (REMOTE DESKTOP PROTOCOL)
+-------------------------------------------------
+
+Purpose:
+- Full remote Windows desktop
+- GUI session
+- Keyboard & mouse forwarded
+- Remote machine renders graphics
+
+Common Linux Client:
+xfreerdp
+
+# Connect
+xfreerdp /v:192.168.1.20 /u:Administrator
+
+# Specify domain
+xfreerdp /v:IP /u:user /d:DOMAIN
+
+# Fullscreen
+xfreerdp /f /v:IP
+
+# Ignore certificate warning
+xfreerdp /cert:ignore /v:IP /u:user
+
+# Clipboard sharing
+xfreerdp +clipboard
+
+# Drive sharing
+xfreerdp /drive:share,/home/user
+
+-------------------------------------------------
+4. VNC (VIRTUAL NETWORK COMPUTING)
+-------------------------------------------------
+
+Purpose:
+- Cross-platform remote GUI
+- Linux, Windows, macOS
+- Shares existing desktop session
+- Remote machine renders graphics
+
+Default Port:
+5900 + Display Number
+
+Examples:
+:0 → 5900
+:1 → 5901
+:2 → 5902
+
+Common Clients:
+vncviewer
+TigerVNC
+RealVNC
+TightVNC
+
+# Connect
+vncviewer IP:1
+
+-------------------------------------------------
+5. X11 (X WINDOW SYSTEM)
+-------------------------------------------------
+
+Purpose:
+- Display Linux GUI applications
+- Local X Server renders graphics
+- Remote application sends drawing commands
+- Usually tunneled through SSH
+
+Default Ports:
+6000-6009
+
+Display Numbers:
+:0 → 6000
+:1 → 6001
+:2 → 6002
+
+-------------------------------------------------
+6. X11 FORWARDING
+-------------------------------------------------
+
+Enable forwarding
+
+ssh -X user@host
+
+Trusted forwarding
+
+ssh -Y user@host
+
+Run remote GUI application
+
+firefox
+gedit
+xclock
+xeyes
+
+Window appears on LOCAL machine.
+
+-------------------------------------------------
+7. X SERVER vs X CLIENT
+-------------------------------------------------
+
+X Server
+---------
+Owns:
+- Monitor
+- Keyboard
+- Mouse
+
+Provides display services.
+
+Usually your LOCAL computer.
+
+X Client
+---------
+Graphical application:
+- Firefox
+- Gedit
+- xclock
+- Calculator
+
+Requests windows from X Server.
+
+Can run locally or remotely.
+
+-------------------------------------------------
+8. CHECK X11 VARIABLES
+-------------------------------------------------
+
+echo $DISPLAY
+
+Typical values
+
+:0
+localhost:10.0
+
+-------------------------------------------------
+9. ENUMERATION
+-------------------------------------------------
+
+# Check listening ports
+ss -tulnp
+
+# Check RDP
+ss -tulnp | grep 3389
+
+# Check VNC
+ss -tulnp | grep 590
+
+# Check X11
+ss -tulnp | grep 600
+
+# Check display
+echo $DISPLAY
+
+-------------------------------------------------
+10. COMMON SERVICES
+-------------------------------------------------
+
+RDP
+xrdp
+TermService (Windows)
+
+VNC
+vncserver
+TigerVNC
+RealVNC
+
+X11
+Xorg
+X Server
+
+-------------------------------------------------
+11. COMPARISON
+-------------------------------------------------
+
+SSH
+----
+CLI only
+Encrypted
+TCP/22
+
+RDP
+----
+Full desktop
+Remote machine renders graphics
+Encrypted
+TCP/3389
+
+VNC
+----
+Full desktop
+Remote machine renders graphics
+Cross-platform
+TCP/5900+
+
+X11
+----
+Individual GUI applications
+Local machine renders graphics
+Uses X protocol
+Usually tunneled through SSH
+
+-------------------------------------------------
+12. QUICK MENTAL MODEL
+-------------------------------------------------
+
+SSH
+Remote Terminal
+
+RDP
+Remote Windows Desktop
+
+VNC
+Remote Screen Sharing
+
+X11
+Remote Linux GUI Application
+
+-------------------------------------------------
+13. CYBERSECURITY QUICK CHECKS
+-------------------------------------------------
+
+Check for RDP
+ss -tulnp | grep 3389
+
+Check for VNC
+ss -tulnp | grep 590
+
+Check DISPLAY
+echo $DISPLAY
+
+Start X11 Forwarding
+ssh -X user@host
+
+Trusted X11
+ssh -Y user@host
+
+Connect via RDP
+xfreerdp /v:IP /u:user
+
+Connect via VNC
+vncviewer IP:1
