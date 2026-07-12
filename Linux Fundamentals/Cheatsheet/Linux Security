@@ -1,0 +1,375 @@
+=========================================
+LINUX SECURITY CHEAT SHEET
+(AppArmor • SELinux • TCP Wrappers • iptables)
+=========================================
+
+-------------------------------------------------
+1. SECURITY MODELS
+-------------------------------------------------
+
+DAC  = Discretionary Access Control
+MAC  = Mandatory Access Control
+RBAC = Role-Based Access Control
+
+Linux Permissions → DAC
+SELinux/AppArmor → MAC
+
+-------------------------------------------------
+2. SELINUX
+-------------------------------------------------
+
+Purpose:
+Mandatory Access Control (MAC)
+Uses labels (contexts) to determine access.
+
+Status
+
+getenforce
+sestatus
+
+Modes
+
+Enforcing
+Permissive
+Disabled
+
+Temporarily change mode
+
+sudo setenforce 0     # Permissive
+sudo setenforce 1     # Enforcing
+
+View file contexts
+
+ls -Z
+
+View process contexts
+
+ps -eZ
+
+Restore default context
+
+restorecon -Rv /path
+
+-------------------------------------------------
+3. APPARMOR
+-------------------------------------------------
+
+Purpose:
+Mandatory Access Control (MAC)
+Restricts applications using path-based profiles.
+
+Status
+
+aa-status
+
+Loaded profiles
+
+apparmor_status
+
+Enable profile
+
+aa-enforce /etc/apparmor.d/profile
+
+Complain mode (log only)
+
+aa-complain /etc/apparmor.d/profile
+
+Disable profile
+
+aa-disable /etc/apparmor.d/profile
+
+-------------------------------------------------
+4. TCP WRAPPERS
+-------------------------------------------------
+
+Purpose:
+Host-based access control for TCP services.
+Uses:
+/etc/hosts.allow
+/etc/hosts.deny
+
+Order:
+1. Check hosts.allow
+2. Check hosts.deny
+3. Default policy
+
+Allow SSH from one IP
+
+sshd: 192.168.1.100
+
+Allow entire subnet
+
+sshd: 192.168.1.
+
+Allow everyone
+
+ALL: ALL
+
+Deny everyone
+
+ALL: ALL
+
+Example
+
+/etc/hosts.allow
+----------------
+sshd: 192.168.1.50
+
+/etc/hosts.deny
+---------------
+ALL: ALL
+
+NOTE:
+TCP Wrappers are deprecated and many modern Linux
+distributions/services no longer support them.
+
+-------------------------------------------------
+5. IPTABLES
+-------------------------------------------------
+
+Purpose:
+Linux kernel firewall.
+
+Common Chains
+
+INPUT
+OUTPUT
+FORWARD
+
+Default Policies
+
+ACCEPT
+DROP
+REJECT
+
+-------------------------------------------------
+6. VIEW RULES
+-------------------------------------------------
+
+iptables -L
+iptables -L -n
+iptables -L -v
+iptables -S
+
+-------------------------------------------------
+7. DEFAULT POLICY
+-------------------------------------------------
+
+Accept everything
+
+iptables -P INPUT ACCEPT
+
+Drop everything
+
+iptables -P INPUT DROP
+
+-------------------------------------------------
+8. ALLOW / BLOCK TRAFFIC
+-------------------------------------------------
+
+Allow SSH
+
+iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+
+Allow HTTP
+
+iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+
+Allow HTTPS
+
+iptables -A INPUT -p tcp --dport 443 -j ACCEPT
+
+Allow ICMP (Ping)
+
+iptables -A INPUT -p icmp -j ACCEPT
+
+Drop Telnet
+
+iptables -A INPUT -p tcp --dport 23 -j DROP
+
+Reject FTP
+
+iptables -A INPUT -p tcp --dport 21 -j REJECT
+
+-------------------------------------------------
+9. ALLOW ESTABLISHED CONNECTIONS
+-------------------------------------------------
+
+iptables -A INPUT \
+-m conntrack \
+--ctstate ESTABLISHED,RELATED \
+-j ACCEPT
+
+-------------------------------------------------
+10. ALLOW LOOPBACK
+-------------------------------------------------
+
+iptables -A INPUT -i lo -j ACCEPT
+
+-------------------------------------------------
+11. ALLOW SPECIFIC IP
+-------------------------------------------------
+
+iptables -A INPUT \
+-s 192.168.1.100 \
+-j ACCEPT
+
+-------------------------------------------------
+12. BLOCK SPECIFIC IP
+-------------------------------------------------
+
+iptables -A INPUT \
+-s 192.168.1.100 \
+-j DROP
+
+-------------------------------------------------
+13. DELETE RULES
+-------------------------------------------------
+
+List with numbers
+
+iptables -L --line-numbers
+
+Delete by number
+
+iptables -D INPUT 3
+
+Flush all rules
+
+iptables -F
+
+Delete all chains
+
+iptables -X
+
+-------------------------------------------------
+14. SAVE RULES
+-------------------------------------------------
+
+Debian/Ubuntu
+
+iptables-save
+
+Restore
+
+iptables-restore
+
+-------------------------------------------------
+15. COMMON MATCHES
+-------------------------------------------------
+
+Protocol
+
+-p tcp
+-p udp
+-p icmp
+
+Source IP
+
+-s IP
+
+Destination IP
+
+-d IP
+
+Input Interface
+
+-i eth0
+
+Output Interface
+
+-o eth0
+
+Destination Port
+
+--dport 80
+
+Source Port
+
+--sport 53
+
+Connection State
+
+-m conntrack --ctstate NEW
+-m conntrack --ctstate ESTABLISHED
+-m conntrack --ctstate RELATED
+
+-------------------------------------------------
+16. QUICK FIREWALL
+-------------------------------------------------
+
+Allow loopback
+
+iptables -A INPUT -i lo -j ACCEPT
+
+Allow established
+
+iptables -A INPUT -m conntrack \
+--ctstate ESTABLISHED,RELATED -j ACCEPT
+
+Allow SSH
+
+iptables -A INPUT -p tcp \
+--dport 22 -j ACCEPT
+
+Allow HTTP
+
+iptables -A INPUT -p tcp \
+--dport 80 -j ACCEPT
+
+Allow HTTPS
+
+iptables -A INPUT -p tcp \
+--dport 443 -j ACCEPT
+
+Drop everything else
+
+iptables -P INPUT DROP
+
+-------------------------------------------------
+17. ENUMERATION
+-------------------------------------------------
+
+getenforce
+sestatus
+ls -Z
+ps -eZ
+
+aa-status
+apparmor_status
+
+cat /etc/hosts.allow
+cat /etc/hosts.deny
+
+iptables -L -n -v
+iptables -S
+
+-------------------------------------------------
+18. QUICK COMPARISON
+-------------------------------------------------
+
+SELinux
+--------
+MAC
+Label-based
+Very granular
+Common on RHEL, CentOS, Fedora
+
+AppArmor
+---------
+MAC
+Path-based
+Simpler
+Common on Ubuntu, Debian
+
+TCP Wrappers
+------------
+Host-based access control
+hosts.allow / hosts.deny
+Deprecated
+
+iptables
+---------
+Kernel firewall
+Filters packets
+INPUT / OUTPUT / FORWARD chains
